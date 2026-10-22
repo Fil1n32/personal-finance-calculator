@@ -1,5 +1,6 @@
 """Калькулятор личных финансов (MVP)."""
 
+import csv
 import json
 from dataclasses import asdict, dataclass
 from datetime import date
@@ -56,6 +57,14 @@ class FinanceCalculator:
             encoding="utf-8",
         )
 
+    def export_csv(self, filename: str = "operations.csv") -> None:
+        """Экспортирует операции в CSV-файл."""
+        with open(filename, "w", encoding="utf-8", newline="") as file:
+            writer = csv.writer(file, delimiter=";")
+            writer.writerow(["Дата", "Вид", "Сумма", "Категория"])
+            for item in self.operations:
+                writer.writerow([item.date, item.kind, item.amount, item.category])
+
     def load(self) -> None:
         """Загружает операции из JSON."""
         if not DATA_FILE.exists():
@@ -84,6 +93,7 @@ def main() -> None:
         "2. Добавить расход\n"
         "3. Показать операции\n"
         "4. Показать баланс\n"
+        "5. Экспорт операций в CSV\n"
         "0. Выход\n"
     )
     while True:
@@ -97,6 +107,9 @@ def main() -> None:
             calculator.show_operations()
         elif choice == "4":
             print(f"Текущий баланс: {calculator.balance():.2f} руб.")
+        elif choice == "5":
+            calculator.export_csv()
+            print("Операции экспортированы в operations.csv")
         elif choice == "0":
             print("До свидания!")
             break
